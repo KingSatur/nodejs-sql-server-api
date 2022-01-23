@@ -1,23 +1,27 @@
 import mssql from 'mssql';
 import config from '../config';
 
+let pool;
+
 const dbSettings = {
-  server: 'localhost',
+  server: config.dbserver,
   user: config.dbusername,
   port: config.dbport,
   password: config.dbpassword,
+  database: config.dbname,
   options: {
     encrypt: true,
     trustServerCertificate: true,
   },
 };
 
-console.log();
-
-async function getConnection() {
-  const pool = await mssql.connect(dbSettings);
-  const result = await pool.request().query('SELECT 1');
-  console.log(result);
+export async function getConnection() {
+  try {
+    pool = await mssql.connect(dbSettings);
+    return pool;
+  } catch (error) {
+    console.error(JSON.stringify(error));
+  }
 }
 
-getConnection();
+export { mssql, pool };
